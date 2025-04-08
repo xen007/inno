@@ -1,0 +1,22 @@
+
+body{
+    font-family: $quickSand;
+}
+.toast-valid{
+    background-color: $success-text;
+    border-radius: 5px solid white;
+    color: $off-white;
+    text-align: center;
+}
+.toast-invalid{
+    background-color: $error-text;
+    border-radius: 5px solid white;
+    color: $off-white;
+    text-align: center;
+}
+.disable{
+    pointer-events: none;
+    background-color: #ccc;
+    box-shadow: none;
+    opacity: 0.9;
+}

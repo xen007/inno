@@ -1,0 +1,61 @@
+.Entete{
+    font-size: 1.2em;
+   
+}
+.Entete li{
+
+    transition: ease-in-out .3s;
+}
+.Entete li:hover{
+
+    transform: scale(1.02);
+    background-color: rgb(37, 122, 248);
+    padding-bottom: 0px;
+   
+}
+
+
+
+@media only screen  and (max-width: 1028px) {
+    
+    .navbar-nav {
+        display: none;
+        transition: all 1s ease-in-out ;
+        z-index: 100;
+
+    }
+    .nav-mobile{
+
+        display: block;
+        transition: all 1s ease-in-out ;
+        width: 100%;
+    }
+    .Entete li{
+
+        text-align: center;
+        width: 100%;
+    }
+    .Entete{
+       
+        margin-left: 0%;
+        width: 100%;
+        align-items: center;
+        margin: 0;
+    }
+    .navbar-brand{
+
+        text-align: center;
+        width: 100%;
+        padding-left: 50px;
+        color: #0d6efd;
+    }
+    .valide{
+        position: absolute;
+        top: 0;
+        right: 0;
+        border: none;
+    }
+    .valide:active{
+        border: none;
+    }
+}

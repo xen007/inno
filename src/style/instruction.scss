@@ -1,0 +1,49 @@
+
+@import './settings';
+.instructions{
+    border: 1px solid darken( #000000,10%);
+    border-radius: 5px;
+    margin: $lg;
+    padding: $sm $lg;
+
+    .ima{
+        width: 50%;
+        height: 30%;
+        object-fit: contain;
+    }
+    h1{
+        color: #000000;
+        font-size: $md;
+        text-align: center;
+    }
+    .lifel{
+        color: $green;
+        cursor: pointer;
+    }
+    browser-default{
+        padding-left: 30px;
+        margin-top: 10px;
+        margin-bottom: 15px;
+    }
+   #bottom{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+   }
+ 
+}
+@media (max-width:$md-breakpoint){
+    .instructions{
+        width: 100% !important;
+        height: 150% !important;
+    }
+    #bottom{
+        flex-direction: column;
+    }
+
+    .lr{
+        margin-bottom: 10px;
+    }
+  
+}

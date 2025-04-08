@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
+@import './settings';
+
+#hom{
+    background-image: url('../img/thought.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    width: 100vw;
+
+
+    section{
+        
+        background-color: rgb(8, 8, 8);
+        height: 80%;
+        width: 35%;
+        margin: auto;
+        opacity: 0.8;
+        border : 2px solid white;
+        border-radius: 15px;
+        text-align: center;
+
+        h1{
+            font-size: $lg;
+            color: white;
+            font-family: $quickSand;
+        }
+    }
+
+    .cube{
+        font-size: $xxlg;
+        color: $orange;
+    }
+    .play{
+        width: 100%;
+        padding:$normal;
+    }
+
+    .auth-cont{
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+    }
+    .auth-cont .auth-btn{
+        padding: $normal ;
+        width: 45%;
+    }
+
+}
+
+@media (max-width:768px){
+    #hom section{
+        padding: 0 $normal;
+        width: 100%;
+        height: 100%;
+        margin: auto;
+    }
+}
