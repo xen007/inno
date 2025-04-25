@@ -1,18 +1,8 @@
 
 @import './settings';
 .instructions{
-    border: 1px solid darken( #000000,10%);
-    border-radius: 5px;
-    margin: $lg;
-    padding: $sm $lg;
-
-    .ima{
-        width: 50%;
-        height: 30%;
-        object-fit: contain;
-    }
+    padding: $sm ;
     h1{
-        color: #000000;
         font-size: $md;
         text-align: center;
     }
@@ -20,30 +10,40 @@
         color: $green;
         cursor: pointer;
     }
-    browser-default{
-        padding-left: 30px;
-        margin-top: 10px;
-        margin-bottom: 15px;
-    }
-   #bottom{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-   }
- 
 }
-@media (max-width:$md-breakpoint){
-    .instructions{
-        width: 100% !important;
-        height: 150% !important;
-    }
-    #bottom{
-        flex-direction: column;
-    }
+.instructions {
+   
+    align-items: center; /* Center content vertically */
+    justify-content: center; /* Center content horizontally */
+    background-image: url("../img/thought.jpg"); /* Add background image */
+    background-size: cover; /* Ensure background covers entire viewport */
+    background-position: center; /* Center background image */
+}
+.content-wrapper {
+    width: 100%; /* Full width */
+    max-width: 50%; /* Limit content to half the screen width */
+    border: 2px solid white; /* Add border */
+    border-radius: 15px; /* Rounded corners */
+    padding: 2rem; /* Add spacing inside */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); /* Add shadow for aesthetic */
+}
 
-    .lr{
-        margin-bottom: 10px;
+/* For small screens */
+@media (max-width: 768px) {
+    .content-wrapper {
+        padding: 1rem;
+        max-width: 90%; /* Expand width for better display on small screens */
     }
-  
+}
+
+/* For very small screens */
+@media (max-width: 480px) {
+    .content-wrapper {
+        max-width: 95%; /* Slightly larger for better fit */
+        padding: 1rem; /* Compact padding for small space */
+    }
+   
+    img {
+        max-width: 80%; /* Make images smaller */
+    }
 }

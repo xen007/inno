@@ -67,10 +67,10 @@ class Summary extends Component {
         // Stats Conditional Display
         const stats = (numberOfQuestions === 0) ? (
             <Fragment>
-                <h1 className="no-stats text-center">No Stats Available</h1>
+                <h1 className="no-stats text-center">Pas de Stats Disponible</h1>
                 <div className="d-flex justify-content-center mt-3">
-                    <Link to="/revisions" className="btn btn-warning mx-2">Back to Home</Link>
-                    <Link to="/playIns/begin" className="btn btn-primary mx-2">Try a Quiz</Link>
+                    <Link to="/revisions" className="btn btn-warning mx-2">Retour à l'Acceuil</Link>
+                    <Link to="/playIns/begin" className="btn btn-primary mx-2">Essayer une Session</Link>
                 </div>
             </Fragment>
         ) : (
@@ -79,38 +79,38 @@ class Summary extends Component {
                     <h2 className="text-center">Quiz Summary</h2>
                     <div className="text-center my-3">
                         <BiCheckCircle size={48} style={{ color: "green" }} />
-                        <h1>Quiz has ended</h1>
+                        <h1>Fin de la Session</h1>
                         <h4>{remark}</h4>
-                        <h3>Your score: {score.toFixed(2)}%</h3>
+                        <h3>Votre score: {score.toFixed(2)}%</h3>
                     </div>
 
                     <div className="row">
-                        <div className="col-6 text-end font-weight-bold">Number of Questions:</div>
+                        <div className="col-6 text-end font-weight-bold">Nombre de Questions:</div>
                         <div className="col-6">{numberOfQuestions}</div>
                     </div>
                     <div className="row">
-                        <div className="col-6 text-end font-weight-bold">Number of Answered Questions:</div>
+                        <div className="col-6 text-end font-weight-bold">Nombre de Questions répondus:</div>
                         <div className="col-6">{numberOfAnswered}</div>
                     </div>
                     <div className="row">
-                        <div className="col-6 text-end font-weight-bold">Correct Answers:</div>
+                        <div className="col-6 text-end font-weight-bold">Réponses Correctes:</div>
                         <div className="col-6">{correctAnswers}</div>
                     </div>
                     <div className="row">
-                        <div className="col-6 text-end font-weight-bold">Wrong Answers:</div>
+                        <div className="col-6 text-end font-weight-bold">Réponses éronées:</div>
                         <div className="col-6">{wrongAnswers}</div>
                     </div>
                     <div className="row">
-                        <div className="col-6 text-end font-weight-bold">Hints Used:</div>
+                        <div className="col-6 text-end font-weight-bold">Hints :</div>
                         <div className="col-6">{hintsUsed}</div>
                     </div>
                     <div className="row">
-                        <div className="col-6 text-end font-weight-bold">50/50s Used:</div>
+                        <div className="col-6 text-end font-weight-bold">50/50s :</div>
                         <div className="col-6">{fiftyFiftyUsed}</div>
                     </div>
                     <div className="d-flex justify-content-center mt-3">
-                        <Link to="/revisions" className="btn btn-warning mx-2 ">Back to Home</Link>
-                        <Link to="/playIns/" className="btn btn-primary mx-2">Try Again</Link>
+                        <Link to="/" className="btn btn-warning mx-2 ">Retour à L'Acceuil</Link>
+                        <Link to="/playIns/" className="btn btn-primary mx-2">Essayer encore</Link>
                     </div>
                 </div>
             </Fragment>

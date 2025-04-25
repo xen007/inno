@@ -1,7 +1,7 @@
 // src/config.js
 
 const config = {
-    apiBaseUrl: 'http://DESKTOP-52N9UFI/inno/api'
+    apiBaseUrl: 'http://quizza.com/inno/api'
   };
   
   export default config;

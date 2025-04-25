@@ -1,53 +1,135 @@
-import {  useState } from 'react';
-import '../style/entete.css';
-import {Link} from "react-router-dom";
-import { FaTimes } from "react-icons/fa";
-const Entete = () => {
+import { FaMoon, FaSun, FaUser } from 'react-icons/fa';
+import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
+import { useContext, useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthProvider';
+import ResetPass from '../components/ResetPass';
+import Login from '../components/Login';
+import Registration from '../components/Registration';
 
-   const [mobile, setmobile] = useState(true);
+function BasicExample() {
+  const { auth, logout } = useContext(AuthContext);
+  const [showPopup, setShowPopup] = useState({ login: false, register: false, changePassword: false });
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [greetingText, setGreetingText] = useState('');
+  const navigate = useNavigate();
 
-   const shownavbar = () =>{
-    if(mobile){
-      setmobile(false);
+  useEffect(() => {
+    if (auth) {
+      setGreetingText(`Hello, ${auth.username || 'User'}!`);
+    } else {
+      setGreetingText("Vous n'êtes pas connecté !");
     }
-    else{
-      setmobile(true);
-    }
-   }
-  
-    return ( 
+  }, [auth]);
 
-        <div className=" navbar navbar-expand-lg navbar-dark bg-dark"  >
-            <div className="container-fluid">
-    <a className="navbar-brand " href="#">INNOSOFT</a>
-   
-    <div className=" Entete" >
-      <ul className= {mobile? 'navbar-nav': 'nav-mobile'} >
-        <li className="nav-item">
-          <Link to="/" className="nav-link active a text-light" aria-current="page" href="#">Accueil</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/Service" className="nav-link active a text-light" >Prestation de Services</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/Formation" className="nav-link active a text-light" >Nos formations</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/produit" className="nav-link active a text-light" >Produits</Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/revisions" className="nav-link active a text-light" >Revisions</Link>
-        </li>
-      </ul>
-    <button  className="valide navbar-toggler" onClick={shownavbar} >
-      {
-        mobile? (<span className="navbar-toggler-icon"></span>):(<FaTimes/>)
+  const handleLogout = async () => {
+    if (window.confirm('Voulez-vous vraiment vous déconnecter ?')) {
+      try {
+        localStorage.removeItem('auth');
+        localStorage.removeItem('questions');
+        await logout();
+        navigate('/', { replace: true });
+      } catch (error) {
+        console.error('Error logging out:', error);
+        alert('Échec de déconnexion. Veuillez réessayer.');
       }
-    </button>
-    </div>
-  </div>
-</div>
-     );
+    }
+  };
+
+  const toggleTheme = () => setIsDarkMode((prev) => !prev);
+
+  const togglePopup = (type, state) => setShowPopup((prev) => ({ ...prev, [type]: state }));
+
+  return (
+    <Navbar expand="lg" className={`sticky-top ${isDarkMode ? 'bg-dark text-light' : 'bg-light text-dark'}`}>
+      <Container>
+        {/* Branding */}
+        <Navbar.Brand>
+          <Link to="/" className={`navbar-brand ${isDarkMode ? 'text-light' : 'text-dark'}`}>
+            IntelliQuiz
+          </Link>
+        </Navbar.Brand>
+
+        <Navbar.Toggle aria-controls="navbar-nav" />
+        <Navbar.Collapse id="navbar-nav">
+          <Nav className="mx-auto d-flex align-items-center justify-content-center">
+            {/* Theme Toggle */}
+            <button
+              className={`btn ${isDarkMode ? 'btn-light' : 'btn-dark'} me-3`}
+              onClick={toggleTheme}
+            >
+              {isDarkMode ? <FaSun /> : <FaMoon />} {isDarkMode ? ' Light Mode' : ' Dark Mode'}
+            </button>
+
+            {/* Navigation Links */}
+            <Link to="/" className={`nav-link ${isDarkMode ? 'text-light' : 'text-dark'}`}>Acceuil</Link>
+
+            {/* Greeting Text */}
+            <span className={`mx-3 fw-semibold ${isDarkMode ? 'text-light' : 'text-dark'}`}>
+              {greetingText}
+            </span>
+
+            {/* User Menu Dropdown */}
+            <NavDropdown
+              align="end"
+              title={
+                <span className={`align-items-center ${isDarkMode ? 'text-light' : 'text-dark'}`}>
+                  <FaUser className="me-1" />
+                </span>
+              }
+              className="dropdown-menu-end"
+            >
+              {auth ? (
+                <>
+                  <NavDropdown.Item>utilisateur: {auth.username || 'N/A'}</NavDropdown.Item>
+                  <NavDropdown.Item>Matricule: {auth.matricule || 'N/A'}</NavDropdown.Item>
+                  <NavDropdown.Divider />
+                  <NavDropdown.Item onClick={handleLogout}>
+                    Deconnecter
+                  </NavDropdown.Item>
+                  <NavDropdown.Item onClick={() => togglePopup('changePassword', true)}>
+                    Changer le mot de passe
+                  </NavDropdown.Item>
+                </>
+              ) : (
+                <>
+                  <NavDropdown.Item onClick={() => togglePopup('login', true)}>Se connecter</NavDropdown.Item>
+                  <NavDropdown.Item onClick={() => togglePopup('register', true)}>S'enregistrer</NavDropdown.Item>
+                </>
+              )}
+            </NavDropdown>
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+
+      {/* Login Popup */}
+      {showPopup.login && (
+        <Login
+          onClose={() => togglePopup('login', false)}
+          onLogin={(user) => {
+            setGreetingText(`Hello, ${user.username || 'User'}!`);
+            togglePopup('login', false);
+          }}
+        />
+      )}
+
+      {/* Registration Popup */}
+      {showPopup.register && (
+        <Registration
+          onClose={() => togglePopup('register', false)}
+          onRegister={(user) => {
+            setGreetingText(`Hello, ${user.username || 'User'}!`);
+            togglePopup('register', false);
+          }}
+        />
+      )}
+
+      {/* Password Reset Popup */}
+      {showPopup.changePassword && (
+        <ResetPass onClose={() => togglePopup('changePassword', false)} />
+      )}
+    </Navbar>
+  );
 }
- 
-export default Entete;
+
+export default BasicExample;

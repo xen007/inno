@@ -1,0 +1,44 @@
+.navbar-custom {
+  background-color: #4caf50; /* Vibrant Green Color for Navbar */
+  color: #ffffff; /* White Text Color */
+}
+
+.theme-light {
+  background-color: #f1f1f1; /* Light Mode Background */
+  color: #333; /* Dark Text Color */
+}
+
+.theme-dark {
+  background-color: #232b2b; /* Dark Mode Background */
+  color: #f7f7f7; /* Light Text Color */
+}
+
+.btn-theme-toggle {
+  background-color: #ff9800; /* Orange Color */
+  color: #fff;
+  border: none;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.btn-theme-toggle:hover {
+  background-color: #e91e63; /* Pink Color on Hover */
+  color: #ffffff;
+}
+
+.nav-link {
+  font-size: 16px;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0 10px;
+}
+
+.nav-link:hover {
+  text-decoration: underline;
+}
+
+.greeting-text {
+  font-style: italic;
+  color: #ffffff;
+}

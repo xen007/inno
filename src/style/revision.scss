@@ -1,58 +1,90 @@
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
-@import './settings';
-
-#hom{
+/* Parent container styling */
+#hom {
+    height: 100vh; /* Full viewport height */
+    width: 100vw; /* Full viewport width */
     background-image: url('../img/thought.jpg');
     background-size: cover;
     background-position: center;
-    height: 100vh;
-    width: 100vw;
-
-
-    section{
-        
-        background-color: rgb(8, 8, 8);
-        height: 80%;
-        width: 35%;
-        margin: auto;
-        opacity: 0.8;
-        border : 2px solid white;
-        border-radius: 15px;
-        text-align: center;
-
-        h1{
-            font-size: $lg;
-            color: white;
-            font-family: $quickSand;
-        }
+    display: flex; /* Enable Flexbox */
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+  }
+  
+  /* Section styling */
+  section {
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+    padding: 2rem;
+    border-radius: 15px; /* Rounded corners */
+    width: 90%; /* Responsive width */
+    max-width: 600px; /* Limit width on larger screens */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
+  }
+  
+  /* Header */
+  h1 {
+    font-size: 2.5rem; /* Larger font size for emphasis */
+    margin-bottom: 1rem;
+    color: white;
+  }
+  
+  /* Cube icon styling */
+  .cube {
+    font-size: 5rem;
+    color: orange;
+    margin-bottom: 1rem;
+  }
+  
+  /* Buttons container */
+  .auth-cont {
+    display: flex;
+    flex-direction: column; /* Stack buttons vertically */
+    gap: 1rem; /* Space between buttons */
+  }
+  
+  /* Button styling */
+  .play {
+    font-size: 1.2rem; /* Slightly larger font for prominence */
+    padding: 0.8rem;
+  }
+  
+  .auth-btn {
+    font-size: 1.2rem; /* Match font size with play button */
+    padding: 0.8rem;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    section {
+      width: 90%; /* Expand width for smaller screens */
+      padding: 1.5rem;
     }
-
-    .cube{
-        font-size: $xxlg;
-        color: $orange;
+  
+    h1 {
+      font-size: 2rem; /* Reduce font size for smaller screens */
     }
-    .play{
-        width: 100%;
-        padding:$normal;
+  
+    .auth-cont {
+      gap: 0.8rem; /* Reduce gap between buttons */
     }
-
-    .auth-cont{
-        width: 100%;
-        display: flex;
-        justify-content: space-around;
+  
+    .play,
+    .auth-btn {
+      font-size: 1rem; /* Slightly smaller font for smaller screens */
+      padding: 0.7rem; /* Compact button size */
     }
-    .auth-cont .auth-btn{
-        padding: $normal ;
-        width: 45%;
+  }
+  
+  @media (max-width: 576px) {
+    h1 {
+      font-size: 1.8rem; /* Further adjust for very small screens */
     }
-
-}
-
-@media (max-width:768px){
-    #hom section{
-        padding: 0 $normal;
-        width: 100%;
-        height: 100%;
-        margin: auto;
+  
+    .cube {
+      font-size: 2.5rem; /* Adjust icon size */
     }
-}
+  
+    section {
+      padding: 1.5rem; /* Compact section padding */
+    }
+  }
+  

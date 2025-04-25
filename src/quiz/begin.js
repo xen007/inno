@@ -5,13 +5,15 @@ import { BiIntersect } from "react-icons/bi";
 import { HiLightBulb } from "react-icons/hi";
 import { BsClock } from "react-icons/bs";
 import '../style/begin.scss'
-import M from 'materialize-css'
 import correctNotif from '../quiz/audio/correct-answer.mp3'
 import wrongNotif from '../quiz/audio/wrong-answer.mp3'
 import buttonSound from '../quiz/audio/button-sound.mp3'
 import withNavigate from "./utils/withNavigate";
+import { AuthContext } from '../context/AuthProvider';
+import config from "../utils/config";
 
 class Begin extends Component {
+    static contextType = AuthContext;
 
     constructor(props) {
         super(props);
@@ -20,7 +22,7 @@ class Begin extends Component {
             currentQuestion: {},
             nextQuestion: {},
             previousQuestion: {},
-            answer: '',
+            answer: "",
             numberOfQuestions: 0,
             numberOfAnswered: 0,
             currentQuestionIndex: 0,
@@ -36,12 +38,27 @@ class Begin extends Component {
             error: null,
             nextButtonDisabled: false,
             previousButtonDisabled: true,
+             isLoggedIn: false,
         };
         this.interval = null;
     }
 
     componentDidMount() {
-        this.fetchQuestions();
+        const auth = this.context.auth; // Access auth from AuthContext
+        if (auth) {
+            // User is logged in - proceed accordingly
+            this.setState(
+                { isLoggedIn: true },
+                () => this.fetchQuestions()
+            );
+        } else {
+            // User is not logged in - handle gracefully
+            this.setState(
+                { isLoggedIn: false },
+                () => this.fetchQuestions()
+            );
+        }
+
         this.startTimer();
     }
 
@@ -50,79 +67,118 @@ class Begin extends Component {
     }
 
     fetchQuestions = async () => {
-        const { location } = this.props; // Access location provided by withNavigate HOC
-        const formValue = location.state; // Retrieve data passed through navigate
+        const { location } = this.props;
+        const formValue = location?.state || {}; // Ensure location.state is defined
     
         try {
-            const response = await fetch('http://localhost/inno/api/question.php', {
-                method: 'POST', 
+            const response = await fetch(`${config.apiBaseUrl}/question.php`, {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify(formValue), 
+                body: JSON.stringify(formValue),
             });
     
             if (!response.ok) {
-                throw new Error('Failed to fetch questions. Please check your backend.');
+                throw new Error("Echc lors de la recherche. Verifiez svp.");
             }
     
             const data = await response.json();
     
             if (Array.isArray(data) && data.length > 0) {
+                let questionsToDisplay;
+    
+                if (this.state.isLoggedIn) {
+                    // Shuffle all questions for logged-in users
+                    questionsToDisplay = this.shuffleArray(data);
+                } else {
+                    // Slice first 5 questions and then shuffle them for not logged-in users
+                    const firstFiveQuestions = data.slice(0, 5);
+                    questionsToDisplay = this.shuffleArray(firstFiveQuestions);
+                }
+    
                 this.setState({
-                    questions: data,
+                    questions: questionsToDisplay,
                     loading: false,
-                    numberOfQuestions: data.length,
+                    numberOfQuestions: questionsToDisplay.length,
                 }, () => {
-                    this.displayQuestion(data); // Ensure questions are displayed after state update
+                    this.displayQuestion(questionsToDisplay);
                 });
             } else {
                 this.setState({ loading: false });
-                alert("No questions available.");
+                alert("Pas de Questions Disponible.");
             }
         } catch (error) {
             this.setState({
                 error: error.message,
                 loading: false,
             });
-            console.error('Error fetching questions:', error);
+            console.error("Erreur lors de la Recherche:", error);
         }
+    };
+    
+    shuffleArray = (array) => {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const randomIndex = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[i]];
+        }
+        return shuffled;
     };
     
     displayQuestion = (questions = this.state.questions) => {
         const { currentQuestionIndex, numberOfQuestions } = this.state;
     
         if (questions.length === 0 || currentQuestionIndex < 0 || currentQuestionIndex >= numberOfQuestions) {
-            alert("Invalid question index or no questions available.");
+            alert("Index inexistant ou pas de questions.");
             return;
         }
+    
+        // Use the existing showOptions method to reset visibility
+        this.showOptions();
     
         const currentQuestion = questions[currentQuestionIndex] || {};
         const nextQuestion = questions[currentQuestionIndex + 1] || null;
         const previousQuestion = questions[currentQuestionIndex - 1] || null;
         const answer = currentQuestion.answer || '';
     
-        this.setState({
-            currentQuestion,
-            nextQuestion,
-            previousQuestion,
-            answer,
-        }, () => {
-            this.showOptions();
-            this.handleDisableButton();
-        });
+        this.setState(
+            {
+                currentQuestion,
+                nextQuestion,
+                previousQuestion,
+                answer,
+            },
+            () => {
+                this.handleDisableButton();
+            }
+        );
     };
-        handleOptionClick = (e) => {
+    
+    renderAuthMessage = () => {
+        const { isLoggedIn } = this.state;
+
+        return isLoggedIn ? (
+            <p className="auth-message">Vous êtes Connecté!</p>
+        ) : (
+            <p className="auth-message">Vous n'êtes pas Connecté ! Vous aurez droit à 5 questions.</p>
+        );
+    };
+
+
+
+
+    handleOptionClick = (e) => {
         const selectedOption = e.target.getAttribute('data-answer');
         if (selectedOption.toLowerCase() === this.state.answer.toLowerCase()) {
             setTimeout(() => {
                 document.getElementById('correctN').play();
-            }, 500);
+            }, 300);
             this.correctAnswer();
         } else {
             setTimeout(() => {
                 document.getElementById('wrongN').play();
-            }, 500);
+            }, 300);
             this.wrongAnswer();
         }
     };
@@ -165,8 +221,8 @@ class Begin extends Component {
 
     handleQuitBtnClick = () => {
         this.playBtnSound();
-        if (window.confirm('Are you sure to quit?')) {
-            this.props.navigate('/revisions'); // Use navigate function passed as prop
+        if (window.confirm('Etes-vous sûr de vouloir Quitter?')) {
+            this.props.navigate('/'); // Use navigate function passed as prop
         }
     };
 
@@ -189,55 +245,84 @@ class Begin extends Component {
     playBtnSound = () => {
         document.getElementById('buttonS').play();
     };
+// Custom toast function
+showToast = (message, type) => {
+    const toast = document.createElement('div');
+    toast.innerText = message;
+    Object.assign(toast.style, {
+        position: 'fixed',
+        top: '15%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        padding: '10px 20px',
+        color: '#fff',
+        backgroundColor: type === 'correct' ? 'green' : 'red',
+        borderRadius: '5px',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)',
+        zIndex: '1000',
+        textAlign: 'center',
+        minWidth: 'fit-content',
+    });
 
-    correctAnswer = () => {
-        M.toast({
-            html: 'Correct',
-            classes: 'toast-valid',
-            displayLength: 1500
-        });
+    document.body.appendChild(toast);
 
-        this.setState((prevState) => ({
+    setTimeout(() => {
+        document.body.removeChild(toast);
+    }, 1500); // Display length (in ms)
+};
+
+// Function to handle correct answers
+correctAnswer = () => {
+    this.showToast('Correct', 'correct'); // Show custom toast
+    this.setState(
+        (prevState) => ({
             score: prevState.score + 1,
             correctAnswers: prevState.correctAnswers + 1,
-            numberOfAnswered: prevState.numberOfAnswered + 1
-        }), () => {
+            numberOfAnswered: prevState.numberOfAnswered + 1,
+        }),
+        () => {
             if (this.state.currentQuestionIndex < this.state.numberOfQuestions - 1) {
-                this.setState((prevState) => ({
-                    currentQuestionIndex: prevState.currentQuestionIndex + 1
-                }), () => {
-                    this.displayQuestion(this.state.questions);
-                });
+                this.setState(
+                    (prevState) => ({
+                        currentQuestionIndex: prevState.currentQuestionIndex + 1,
+                    }),
+                    () => {
+                        this.displayQuestion(this.state.questions);
+                    }
+                );
             } else {
                 this.endGame();
             }
-        });
-    };
+        }
+    );
+};
 
-    wrongAnswer = () => {
-        navigator.vibrate(1000);
-        M.toast({
-            html: 'Wrong',
-            classes: 'toast-invalid',
-            displayLength: 1500
-        });
+// Function to handle wrong answers
+wrongAnswer = () => {
+    navigator.vibrate(1000); // Vibrate for feedback
+    this.showToast('Wrong', 'wrong'); // Show custom toast
 
-        this.setState((prevState) => ({
+    this.setState(
+        (prevState) => ({
             wrongAnswers: prevState.wrongAnswers + 1,
-            numberOfAnswered: prevState.numberOfAnswered + 1
-        }), () => {
+            numberOfAnswered: prevState.numberOfAnswered + 1,
+        }),
+        () => {
             if (this.state.currentQuestionIndex < this.state.numberOfQuestions - 1) {
-                this.setState((prevState) => ({
-                    currentQuestionIndex: prevState.currentQuestionIndex + 1
-                }), () => {
-                    this.displayQuestion(this.state.questions);
-                });
+                this.setState(
+                    (prevState) => ({
+                        currentQuestionIndex: prevState.currentQuestionIndex + 1,
+                    }),
+                    () => {
+                        this.displayQuestion(this.state.questions);
+                    }
+                );
             } else {
                 this.endGame();
             }
-        });
-    };
-
+        }
+    );
+};
     showOptions = () => {
         const options = Array.from(document.querySelectorAll('.option'));
         options.forEach((option) => {
@@ -343,7 +428,7 @@ class Begin extends Component {
         });
     };
     endGame = () => {
-        alert('Quiz has ended');
+        alert('Fin de la Session!');
         const state = this.state;
         const playerStats = {
             score: state.score,
@@ -364,74 +449,89 @@ class Begin extends Component {
     };
 
     render() {
-        const { currentQuestion, currentQuestionIndex, numberOfQuestions, hints, fiftyFifty, time } = this.state
+        const { currentQuestion, currentQuestionIndex, numberOfQuestions, hints, fiftyFifty, time, loading, error } = this.state;
+        if (loading) return <p>Loading...</p>;
+        if (error) return <p>{error}</p>;
         return (
             <Fragment>
                 <Entete />
-                <Helmet><title>Start</title></Helmet>
+                <Helmet><title>Commencer</title></Helmet>
                 <Fragment>
                     <audio id="correctN" src={correctNotif}></audio>
                     <audio id="wrongN" src={wrongNotif}></audio>
                     <audio id="buttonS" src={buttonSound}></audio>
                 </Fragment>
-                <div className="questions">
-                    <h2>Hello sur la page de lancement</h2>
-                    {/* <div className="lifeline-contain">
+                <div className="questions container py-4">
+                    <h2 className="text-center mb-4">Bienvenue Sur la page des Questions</h2>
+                    {this.renderAuthMessage()}
+                    <div className="d-flex justify-content-between align-items-center">
                         <p className="lifeline">
-                            <span onClick={this.handleFiftyFifty}><BiIntersect className="lifeline-icon" /> </span>
-                            < >{fiftyFifty}</>
+                            <span onClick={this.handleFiftyFifty}>
+                                <BiIntersect className="lifeline-icon" />
+                            </span>
+                            {fiftyFifty}
                         </p>
                         <p className="lifeline">
-                            <span onClick={this.handleHints}><HiLightBulb className="lifeline-icon" /> </span>
-                            < >{hints}</>
+                            <span onClick={this.handleHints}>
+                                <HiLightBulb className="lifeline-icon" />
+                            </span>
+                            {hints}
                         </p>
                     </div>
-                    <div>
-                        <p className="lifeline-contain">
-                            <span >{currentQuestionIndex + 1} of {numberOfQuestions} </span>
-                            <span className="lifeline">{time.minutes}:{time.seconds} <BsClock /></span>
-                        </p>
-                    </div> */}
-                    <h5>{currentQuestion.question}</h5>
-                    <div className="option-contain">
-                        <p onClick={this.handleOptionClick} className="option" data-answer={currentQuestion.optionA}>{currentQuestion.optionA}</p>
-                        <p onClick={this.handleOptionClick} className="option" data-answer={currentQuestion.optionB}>{currentQuestion.optionB}</p>
-                    </div>
-                    <div className="option-contain">
-                        <p onClick={this.handleOptionClick} className="option" data-answer={currentQuestion.optionC}>{currentQuestion.optionC}</p>
-                        <p onClick={this.handleOptionClick} className="option" data-answer={currentQuestion.optionD}>{currentQuestion.optionD}</p>
+                    <div className="d-flex justify-content-between align-items-center mt-3">
+                        <span>{currentQuestionIndex + 1} of {numberOfQuestions}</span>
+                        <span className="lifeline">
+                            {time?.minutes}:{time?.seconds} <BsClock />
+                        </span>
                     </div>
 
-                    <div className="btn-contain">
-                        {/* <button
-                            className="btn btn-secondary"
-                            id="previous-btn"
-                            onClick={this.handleBtnClick}
-                            disabled={this.state.previousButtonDisabled}
-                        >
-                            Previous
-                        </button>
-                        <button
-                            className="btn btn-success"
-                            id="next-btn"
-                            onClick={this.handleBtnClick}
-                            disabled={this.state.nextButtonDisabled}
-                        >
-                            Next
-                        </button> */}
-                        <button
-                            id="quit-btn"
-                            onClick={this.handleBtnClick}
-                            className="btn btn-danger"
-                        >
-                            Quit
-                        </button>
+                    <h5 className="text-center mb-3">{currentQuestion.question}</h5>
+                    <div className="option-contain row">
+                        <div className="col-12 col-md-6 mb-3">
+                            <p onClick={this.handleOptionClick} className="option btn btn-outline-primary w-100" data-answer={currentQuestion.optionA}>{currentQuestion.optionA}</p>
+                        </div>
+                        <div className="col-12 col-md-6 mb-3">
+                            <p onClick={this.handleOptionClick} className="option btn btn-outline-primary w-100" data-answer={currentQuestion.optionB}>{currentQuestion.optionB}</p>
+                        </div>
+                        <div className="col-12 col-md-6 mb-3">
+                            <p onClick={this.handleOptionClick} className="option btn btn-outline-primary w-100" data-answer={currentQuestion.optionC}>{currentQuestion.optionC}</p>
+                        </div>
+                        <div className="col-12 col-md-6 mb-3">
+                            <p onClick={this.handleOptionClick} className="option btn btn-outline-primary w-100" data-answer={currentQuestion.optionD}>{currentQuestion.optionD}</p>
+                        </div>
                     </div>
+                    <div className="btn-contain d-flex flex-row flex-xs-column justify-content-between">
+  {/* <button
+    className="btn btn-secondary mb-0"
+    id="previous-btn"
+    onClick={this.handleBtnClick}
+    disabled={this.state.previousButtonDisabled}
+  >
+    Previous
+  </button> */}
+  <button
+    className="btn btn-success mb-0"
+    id="next-btn"
+    onClick={this.handleBtnClick}
+    disabled={this.state.nextButtonDisabled}
+  >
+    Suivant
+  </button>
+  <button
+    id="quit-btn"
+    onClick={this.handleBtnClick}
+    className="btn btn-danger mb-0"
+  >
+    Quitter
+  </button>
+</div>
 
                 </div>
-
             </Fragment>
-        )
+        );
+
     }
 }
-export default withNavigate(Begin)
+
+export default withNavigate(Begin);
+

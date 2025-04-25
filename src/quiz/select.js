@@ -1,6 +1,6 @@
 // Importation des modules
 import React, { useEffect, useState } from "react";
-import config from "./config";
+import config from "../utils/config";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { useNavigate } from "react-router-dom";
@@ -158,7 +158,7 @@ export default function Select() {
             Fermer
           </button>
           <button onClick={handleSubmit} className="btn btn-primary">
-            Submit
+            Valider
           </button>
         </Modal.Footer>
       </Modal>

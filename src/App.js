@@ -1,39 +1,47 @@
 import "./bootstrap-5.0.2-dist/css/bootstrap.min.css";
-
 import './App.css';
-import Accueil from "./component/Accueil";
-import { BrowserRouter as Router,Routes, Route} from "react-router-dom";
-import Services from "./component/Services";
-import Formation from "./component/Formation";
-import Jeune from "./component/Jeune_Av";
-import JeuneInter from "./component/Jeune_Inter";
-import AdulteAv from "./component/Adulte_Av";
-import AdulteInter from "./component/Adulte_Inter"
-import Produit from "./component/produit";
+import { BrowserRouter as Router,Routes, Route, Navigate, useLocation} from "react-router-dom";
 import Revisions from "./quiz/revisions";
 import PlayIns from "./quiz/playIns";
 import Begin from "./quiz/begin";
 import Summary from "./quiz/summary";
+import Login from "./components/Login";
+import { AuthContext } from "./context/AuthProvider"; // Ensure AuthProvider and AuthContext are correctly imported
+import { useContext, useState, useEffect } from "react";
+import { LanguageProvider } from "./context/translateApi"; // Adjust path if needed
 
 function App() {
+  const { auth } = useContext(AuthContext); // Get auth state from AuthContext
   return (
     <div className="App">
-      <Router> 
-       <Routes>
-        <Route path={'/'} element={<Accueil/>}  />
-        <Route path={'/Service'} element={<Services/>}  />
-        <Route path={'/Formation'} element={<Formation/>}  />
-        <Route path={'/Formation/Jeune_Av'} element={<Jeune/>}  />
-        <Route path={'/Formation/Jeune_Inter'} element={<JeuneInter/>}  />
-        <Route path={'/Formation/Adulte_Av'} element={<AdulteAv/>} />
-        <Route path={'/Formation/Adulte_Inter'} element={<AdulteInter/>} />
-        <Route path={'/produit'} element={<Produit/>} />
-        <Route path={'/Revisions'} element={<Revisions />} />
-        <Route path={'/playIns'} element={<PlayIns />} />
-        <Route path={'/playIns/begin'} element={<Begin/>} />
-        <Route path={'/PlayIns/summary'} element={<Summary/>} />
-     </Routes>
-    </Router>
+      <LanguageProvider>
+      <Router>
+        <Routes>
+          {/* Conditional Routes Based on Authentication */}
+          {auth ? (
+            <>
+              {/* Authenticated Routes */}
+              <Route path="/" element={<Revisions />} />
+              <Route path="/playIns" element={<PlayIns />} />
+              <Route path="/playIns/begin" element={<Begin />} />
+              <Route path="/PlayIns/summary" element={<Summary />} />
+              <Route path="/login" element={<Login />} />
+            </>
+          ) : (
+            <>
+              {/* Non-Authenticated Routes */}
+              <Route path="/" element={<Revisions />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/playIns" element={<PlayIns />} />
+              <Route path="/playIns/begin" element={<Begin />} />
+              <Route path="/PlayIns/summary" element={<Summary />} />
+              {/* Redirect other paths to / */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </>
+          )}
+        </Routes>
+      </Router>
+      </LanguageProvider>
     </div>
   );
 }
